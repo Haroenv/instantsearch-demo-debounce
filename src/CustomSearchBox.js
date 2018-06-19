@@ -96,7 +96,7 @@ class SearchBox extends React.Component {
             {...cx('submit')}
           >
             <svg role="img">
-              <use href="#sbx-icon-search-13" />
+              <use xlinkHref="#sbx-icon-search-13" />
             </svg>
           </button>
           <button
@@ -106,7 +106,7 @@ class SearchBox extends React.Component {
             onClick={this.onReset}
           >
             <svg role="img">
-              <use href="#sbx-icon-clear-3" />
+              <use xlinkHref="#sbx-icon-clear-3" />
             </svg>
           </button>
         </div>
