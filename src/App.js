@@ -4,7 +4,6 @@ import React from 'react';
 import { createConnector } from 'react-instantsearch';
 import {
   InstantSearch,
-  SearchBox,
   RefinementList,
   SortBy,
   Stats,
@@ -16,23 +15,34 @@ import {
 } from 'react-instantsearch/dom';
 import { connectRange } from 'react-instantsearch/connectors';
 import { withUrlSync } from './urlSync';
+import CustomSearchBox from './CustomSearchBox';
 import PropTypes from 'prop-types';
 import Slider from 'rc-slider';
 
-const App = props =>
+const App = ({
+  createURL,
+  onSearchStateChange,
+  searchState,
+  mode,
+  debounce,
+}) => (
   <InstantSearch
     apiKey="6be0576ff61c053d5f9a3225e2a90f76"
     appId="latency"
     className="container-fluid"
-    createURL={props.createURL}
+    createURL={createURL}
     indexName="instant_search"
-    onSearchStateChange={props.onSearchStateChange}
+    onSearchStateChange={onSearchStateChange}
     searchParameters={{ hitsPerPage: 10 }}
-    searchState={props.searchState}
+    searchState={searchState}
   >
     <header id="header">
       <img alt="instant-search-logo" src="instant_search_logo@2x.png" />
-      <SearchBox translations={{ placeholder: 'Search for products' }} />
+      <CustomSearchBox
+        searchAsYouType={mode !== 'enter'}
+        debounce={debounce}
+        translations={{ placeholder: 'Search for products' }}
+      />
     </header>
     <main>
       <Content />
@@ -45,9 +55,10 @@ const App = props =>
       - Powered by <a href="https://www.algolia.com">Algolia</a> - Data from{' '}
       <a href="https://developer.bestbuy.com">Best Buy</a>
     </footer>
-  </InstantSearch>;
+  </InstantSearch>
+);
 
-const RightColumn = () =>
+const RightColumn = () => (
   <div id="right-column">
     <div className="info">
       <Stats />
@@ -64,7 +75,8 @@ const RightColumn = () =>
     <div id="pagination">
       <Pagination showLast />
     </div>
-  </div>;
+  </div>
+);
 
 const Content = createConnector({
   displayName: 'ConditionalResults',
@@ -75,14 +87,16 @@ const Content = createConnector({
     return { query: searchState.query, noResults };
   },
 })(({ noResults, query }) => {
-  const rightColumn = noResults
-    ? <div id="no-results-message">
-        <p>
-          We didn't find any results for the search <em>{query}</em>.
-        </p>
-        <ClearAll />
-      </div>
-    : <RightColumn />;
+  const rightColumn = noResults ? (
+    <div id="no-results-message">
+      <p>
+        We didn't find any results for the search <em>{query}</em>.
+      </p>
+      <ClearAll />
+    </div>
+  ) : (
+    <RightColumn />
+  );
   return (
     <div>
       <div className={noResults ? 'no-results' : ''} id="left-column">
@@ -142,23 +156,20 @@ class Range extends React.Component {
 
     return (
       <div className="ais-Slider__root">
-        {currentValues.min === undefined && currentValues.max === undefined
-          ? null
-          : <Slider
-              max={Math.trunc(max)}
-              min={Math.trunc(min)}
-              onAfterChange={this.onChange}
-              onChange={this.onValuesUpdated}
-              range
-              value={[currentValues.min, currentValues.max]}
-            />}
+        {currentValues.min === undefined &&
+        currentValues.max === undefined ? null : (
+          <Slider
+            max={Math.trunc(max)}
+            min={Math.trunc(min)}
+            onAfterChange={this.onChange}
+            onChange={this.onValuesUpdated}
+            range
+            value={[currentValues.min, currentValues.max]}
+          />
+        )}
         <div className="ais-Slider__values">
-          <div>
-            {min}
-          </div>
-          <div>
-            {max}
-          </div>
+          <div>{min}</div>
+          <div>{max}</div>
         </div>
       </div>
     );
@@ -181,9 +192,7 @@ function Hit({ hit }) {
         <img alt={hit.name} src={`${hit.image}`} />
       </div>
       <div className="hit-content">
-        <div className="hit-price">
-          ${hit.price}
-        </div>
+        <div className="hit-price">${hit.price}</div>
         <div className="hit-name">
           <Highlight attributeName="name" hit={hit} />
         </div>
