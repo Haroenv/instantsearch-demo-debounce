@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && rsync -av build . && rm -rf build"
+    "build": "react-scripts build"
   },
   "main": "index.js",
   "license": "MIT"
